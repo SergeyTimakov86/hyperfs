@@ -1,0 +1,38 @@
+.sidebar {
+    grid-area: sidebar
+}
+
+.main {
+    grid-area: main
+}
+
+.table {
+    --bs-table-border-color: rgba(var(--bs-body-color-rgb), 0.06);
+    --bs-table-striped-bg: rgba(var(--bs-body-color-rgb), 0.02);
+    --bs-table-hover-bg: rgba(var(--bs-body-color-rgb), 0.03);
+}
+
+.table .col-sorted {
+    background-color: rgba(var(--bs-body-color-rgb), 0.02);
+}
+
+th[aria-sort] a::after {
+    opacity: .7;
+}
+
+th[aria-sort="none"] a::after {
+    content: "\f0dc";
+    opacity: .3;
+}
+
+th[aria-sort="ascending"] a::after {
+    content: "\f0de";
+    transform: translateY(0.08em);
+}
+
+th[aria-sort="descending"] a::after {
+    content: "\f0dd";
+    transform: translateY(-0.08em);
+}
+
+

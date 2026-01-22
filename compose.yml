@@ -1,0 +1,171 @@
+volumes:
+  kc_data:
+  pgdata_kc:
+  pgdata_app:
+
+services:
+
+  # =====================
+  # API GATEWAY (ENVOY)
+  # =====================
+  envoy:
+    image: envoyproxy/envoy:contrib-v1.36.4
+    container_name: hf-envoy
+    command: >
+      envoy
+      -c /etc/envoy/envoy.yaml
+      --log-level info
+    volumes:
+      - .docker/envoy/config.yaml:/etc/envoy/envoy.yaml:ro
+    ports:
+      - "8080:8080"     # публичная точка входа
+      - "9901:9901"     # admin (dev only)
+    depends_on:
+      - app
+      - kc
+
+  # =====================
+  # KEYCLOAK
+  # =====================
+  kc:
+    image: quay.io/keycloak/keycloak:26.4.7
+    container_name: hf-kc
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://kc-pg:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_PORT: 8080
+      KEYCLOAK_ADMIN: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_STRICT: "false"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_LOG_LEVEL: info
+      KC_SMTP_HOST: mailpit
+      KC_SMTP_PORT: 1025
+      KC_SMTP_AUTH: "false"
+      KC_SMTP_STARTTLS: "false"
+      KC_SMTP_SSL: "false"
+    volumes:
+      - kc_data:/opt/keycloak/data
+    ports:
+      - "8081:8080"     # dev-доступ к админке
+    depends_on:
+        kc-pg:
+          condition: service_healthy
+
+  kc-pg:
+    image: postgres:17.7-alpine
+    container_name: hf-kc-pg
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    ports:
+      - "5432:5432"
+    volumes:
+        - pgdata_kc:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "keycloak", "-U", "keycloak",]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  mailpit:
+    image: axllent/mailpit:v1.28.0
+    container_name: hf-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  app:
+    container_name: hf-app
+    build:
+      context: .
+    volumes:
+      - ./:/opt/www
+    ports:
+      - "9501:9501"
+    depends_on:
+      app-pg:
+        condition: service_healthy
+
+  app-pg:
+    image: postgres:17.7-alpine
+    container_name: hf-app-pg
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:${DB_PORT}"
+    volumes:
+      - pgdata_app:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  nginx-static:
+    image: nginx:alpine
+    container_name: hf-nginx-static
+    volumes:
+      - ./static:/usr/share/nginx/html:ro
+      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+
+  k6:
+    image: grafana/k6:1.4.2
+    container_name: hf-load
+    ports:
+      - "6565:6565"
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write # Prometheus remote write endpoint
+      - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true
+      - K6_PROMETHEUS_RW_TREND_STATS=p(95),p(99),min,max
+    #command: run --out experimental-prometheus-rw /scripts/script.js
+    volumes:
+      - ./.docker/load/k6/script.js:/scripts/script.js:ro
+
+  prometheus:
+    image: prom/prometheus:v3.8.0-rc.1
+    container_name: hf-prometheus
+    volumes:
+      - ./.docker/obs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-remote-write-receiver'
+      - '--enable-feature=exemplar-storage'
+      - '--enable-feature=native-histograms'
+    depends_on:
+      - app
+
+
+  grafana:
+    image: grafana/grafana:12.3
+    container_name: hf-grafana
+    user: root
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    volumes:
+      - ./.docker/obs/grafana/provisioning:/etc/grafana/provisioning
+      - ./.docker/obs/grafana/dashboards:/var/lib/grafana/dashboards
+
+networks:
+  default:
+    name: hf

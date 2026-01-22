@@ -1,0 +1,185 @@
+static_resources:
+
+  listeners:
+    - name: http_listener
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 8080
+
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: ingress_http
+                generate_request_id: true
+
+                max_request_headers_kb: 4
+                request_headers_timeout: 3s
+                stream_idle_timeout: 10s
+                request_timeout: 10s
+
+                route_config:
+                  name: local_route
+                  virtual_hosts:
+                    - name: api
+                      domains: ["*"]
+
+                      # 🔐 SANITIZE INCOMING HEADERS
+                      request_headers_to_remove:
+                        - authorization
+                        - x-user-id
+                        - x-user-username
+                        - x-user-email
+                        - x-user-roles
+
+                      routes:
+                        - match: { prefix: "/static/" }
+                          route: { cluster: nginx_static, timeout: 3s }
+                          typed_per_filter_config:
+                            envoy.filters.http.jwt_authn:
+                              "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.PerRouteConfig
+                              disabled: true
+
+                        # ================= app =================
+                        - match: { prefix: "/" }
+                          route: { cluster: app, timeout: 3s }
+
+
+                http_filters:
+                  # RATE LIMIT (ANONYMOUS / PRE-JWT)
+                  - name: envoy.filters.http.local_ratelimit
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+                      stat_prefix: rl_anon
+                      token_bucket:
+                        max_tokens: 450
+                        tokens_per_fill: 300
+                        fill_interval: 3s
+                      response_headers_to_add:
+                        - append: false
+                          header:
+                            key: x-rate-limit
+                            value: anon
+                        - append: false
+                          header:
+                            key: retry-after
+                            value: "3"  # секунды до следующей попытки
+                      filter_enabled:
+                        default_value:
+                          numerator: 100
+                          denominator: HUNDRED
+                      filter_enforced:
+                        default_value:
+                          numerator: 100
+                          denominator: HUNDRED
+                      local_rate_limit_per_downstream_connection: false
+
+                  - name: envoy.filters.http.jwt_authn
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+                      providers:
+                        kc_provider:
+                          issuer: "http://kc:8081/realms/realm-mmorket"
+                          audiences:
+                            - "mmorket-web" #client id
+                          remote_jwks:
+                            http_uri:
+                              uri: "http://kc:8081/realms/realm-mmorket/protocol/openid-connect/certs"
+                              cluster: keycloak
+                              timeout: 5s
+                            cache_duration: 600s
+                          forward: true
+                          claim_to_headers:
+                            - claim_name: sub
+                              header_name: x-user-id
+                            - claim_name: preferred_username
+                              header_name: x-user-username
+                            - claim_name: email
+                              header_name: x-user-email
+                            - claim_name: realm_access.roles
+                              header_name: x-user-roles
+
+                      rules:
+                        - match:
+                            prefix: "/api/"
+                          requires:
+                            provider_name: kc_provider
+                        - match:
+                            prefix: "/"
+                          requires:
+                            allow_missing: {}
+
+                  # ================= ROUTER =================
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+  clusters:
+
+    # ================= KEYCLOAK =================
+    - name: keycloak
+      connect_timeout: 5s
+      type: logical_dns
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: keycloak
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: kc
+                      port_value: 8081
+
+    # ================= USER SERVICE =================
+    - name: app
+      connect_timeout: 5s
+      type: logical_dns
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: app
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: app
+                      port_value: 9501
+
+    - name: nginx_static
+      connect_timeout: 2s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: nginx_static
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: nginx-static
+                      port_value: 80
+
+    # ================= ORDER SERVICE =================
+#   - name: order_service
+#     connect_timeout: 5s
+#     type: logical_dns
+#     lb_policy: round_robin
+#     load_assignment:
+#       cluster_name: order_service
+#       endpoints:
+#         - lb_endpoints:
+#             - endpoint:
+#                 address:
+#                   socket_address:
+#                     address: order-service
+#                     port_value: 9501
+
+admin:
+  access_log_path: /tmp/admin_access.log
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901
