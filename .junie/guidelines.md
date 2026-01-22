@@ -52,6 +52,7 @@ final class MyEndpoint extends AdminEndpoint
 
 ### Database
 - Use migrations for all schema changes (`migrations/`).
+- Migrations must not contain a `down()` method, as rollbacks are not used. Fix errors by adding new migrations.
 
 ### UI & Templates
 - Templates are located in `storage/view`.

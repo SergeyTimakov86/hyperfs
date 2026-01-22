@@ -28,6 +28,8 @@ final class Index extends AdminEndpoint
                 new Column('ingame_id', 'ID')->sortable(),
                 new Column('ingame_name', 'Ingame Name')->sortable(),
                 new Column('funpay_name', 'FunPay Name')->sortable(),
+                new Column('discord', 'Discord'),
+                new Column('telegram', 'Telegram'),
                 new Column('updated_at', 'Updated At')->sortable(),
             ));
 

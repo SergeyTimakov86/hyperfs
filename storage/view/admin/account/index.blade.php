@@ -98,6 +98,11 @@ $modalLabelId = 'l-account-add';
                             <input type="text" class="form-control" name="discord">
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label">Telegram</label>
+                            <input type="text" class="form-control" name="telegram">
+                        </div>
+
                     </div>
 
                     <div class="modal-footer">

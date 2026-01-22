@@ -24,6 +24,7 @@ final class Add extends AdminEndpoint
                 'ingame_alliance' => $data['ingame_alliance'] ?? null,
                 'is_seller' => !empty($data['is_seller']),
                 'discord' => $data['discord'] ?? null,
+                'telegram' => $data['telegram'] ?? null,
             ]
         );
 
