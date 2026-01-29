@@ -137,121 +137,16 @@ th[aria-sort] button::after,
     line-height: inherit;
 }
 
-
-.fa-sort {
-    --fa: "\f0dc";
+.fa-pen {
+    --fa: "\f304";
 }
 
-.fa-sort-desc {
-    --fa: "\f0dd";
+.fa-trash {
+    --fa: "\f1f8";
 }
 
-.fa-sort-asc {
-    --fa: "\f0de";
-}
-
-.fa-sort-alpha-asc {
-    --fa: "\f15d";
-}
-
-.fa-sort-alpha-down {
-    --fa: "\f15d";
-}
-
-.fa-arrow-up-a-z {
-    --fa: "\f15e";
-}
-
-.fa-sort-alpha-up {
-    --fa: "\f15e";
-}
-
-.fa-arrow-down-wide-short {
-    --fa: "\f160";
-}
-
-.fa-sort-amount-asc {
-    --fa: "\f160";
-}
-
-.fa-sort-amount-down {
-    --fa: "\f160";
-}
-
-.fa-arrow-up-wide-short {
-    --fa: "\f161";
-}
-
-.fa-sort-amount-up {
-    --fa: "\f161";
-}
-
-.fa-arrow-down-1-9 {
-    --fa: "\f162";
-}
-
-.fa-sort-numeric-asc {
-    --fa: "\f162";
-}
-
-.fa-sort-numeric-down {
-    --fa: "\f162";
-}
-
-.fa-sort-alpha-desc {
-    --fa: "\f881";
-}
-
-.fa-sort-alpha-down-alt {
-    --fa: "\f881";
-}
-
-.fa-arrow-up-z-a {
-    --fa: "\f882";
-}
-
-.fa-sort-alpha-up-alt {
-    --fa: "\f882";
-}
-
-.fa-arrow-down-short-wide {
-    --fa: "\f884";
-}
-
-.fa-sort-amount-desc {
-    --fa: "\f884";
-}
-
-.fa-sort-amount-down-alt {
-    --fa: "\f884";
-}
-
-.fa-arrow-up-short-wide {
-    --fa: "\f885";
-}
-
-.fa-sort-amount-up-alt {
-    --fa: "\f885";
-}
-
-.fa-arrow-down-9-1 {
-    --fa: "\f886";
-}
-
-.fa-sort-numeric-desc {
-    --fa: "\f886";
-}
-
-.fa-sort-numeric-down-alt {
-    --fa: "\f886";
-}
-
-.fa-arrow-up-9-1 {
-    --fa: "\f887";
-}
-
-.fa-sort-numeric-up-alt {
-    --fa: "\f887";
+.fa-add {
+    --fa: "\+";
 }
 
 :root, :host {

@@ -63,6 +63,10 @@
     - All form-related JavaScript MUST be placed in `static/form.js`.
     - Use modular and reusable classes or functions (e.g. `ModalFormHandler`) for form behavior.
     - Use `data-*` attributes for configuration (e.g. `data-add-title`, `data-edit-action`) instead of hardcoding values in JS.
+    - VO-Form Binding: Text inputs MUST use validation constraints from corresponding Value Objects:
+        - Import VO classes in Blade: `use App\Domain\Model\Account\FunpayName;`
+        - Pass VO class to input component: `:vo="FunpayName::class"` — component extracts `minLength()`, `maxLength()`, `pattern()` automatically.
+        - This ensures HTML5 validation matches backend VO rules (single source of truth).
 
 ### 4. Testing
 - Tests: `final`, extend `TestCase`, namespace `HyperfTest\Unit`. Structure MUST mirror `app/`.

@@ -1,5 +1,11 @@
 @php
 
+use App\Domain\Model\Account\FunpayName;
+use App\Domain\Model\Account\IngameId;
+use App\Domain\Model\Account\IngameName;
+use App\Domain\Model\Account\IngameCorporation;
+use App\Domain\Model\Account\IngameAlliance;
+
 /** @var array<string, \App\Domain\Model\Game> $games */
 
 $modalId = 'm-account-add';
@@ -34,8 +40,8 @@ $modalLabelId = 'l-account-add';
 
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h4>Accounts</h4>
-                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#{!! $modalId !!}">
-                    + Add
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#{!! $modalId !!}" title="Add">
+                    <i class="fa fa-add"></i>
                 </button>
             </div>
 
@@ -71,11 +77,11 @@ $modalLabelId = 'l-account-add';
                         <x-input.hidden name="id" value="" />
                         <x-input.hidden name="game_id" :value="$gameSlug ? $games[$gameSlug]->id() : ''" />
 
-                        <x-input.text name="funpay_name" label="FunPay Name" required />
-                        <x-input.text name="ingame_id" label="Ingame ID" required />
-                        <x-input.text name="ingame_name" label="Ingame Name" required />
-                        <x-input.text name="ingame_corp" label="Corporation" />
-                        <x-input.text name="ingame_alliance" label="Alliance" />
+                        <x-input.text name="funpay_name" label="FunPay Name" required :vo="FunpayName::class" />
+                        <x-input.text name="ingame_id" label="Ingame ID" required :vo="IngameId::class" />
+                        <x-input.text name="ingame_name" label="Ingame Name" required :vo="IngameName::class" />
+                        <x-input.text name="ingame_corp" label="Corporation" :vo="IngameCorporation::class" />
+                        <x-input.text name="ingame_alliance" label="Alliance" :vo="IngameAlliance::class" />
                         <x-input.checkbox name="is_seller" label="Is Seller" />
                         <x-input.text name="discord" label="Discord" />
                         <x-input.text name="telegram" label="Telegram" />
