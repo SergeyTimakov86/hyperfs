@@ -28,3 +28,4 @@ An in-game asset exchange and currency sales site like funpay.com
 - test/ - tests (not implemented yet)
 
 More details: .junie/guidelines.md
+

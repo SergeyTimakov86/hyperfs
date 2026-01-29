@@ -1,4 +1,5 @@
-th a::after,
+th[aria-sort] a::after,
+th[aria-sort] button::after,
 .fa-solid,
 .fa-regular,
 .fa-brands,

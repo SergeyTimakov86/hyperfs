@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Shared\Middleware\RequestContext;
+use App\Shared\Infra\Middleware\RequestContext;
 
 return [
     'http' => [

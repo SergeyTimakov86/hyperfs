@@ -65,7 +65,7 @@ static_resources:
                         - append: false
                           header:
                             key: retry-after
-                            value: "3"  # секунды до следующей попытки
+                            value: "3"  # seconds until the next attempt
                       filter_enabled:
                         default_value:
                           numerator: 100

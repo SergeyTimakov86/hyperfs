@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Shared\Presentation\Query;
 
-use App\Shared\RequestParam;
-use Hyperf\HttpServer\Contract\RequestInterface;
+use App\Shared\Infra\RequestParam;
 
+/**
+ * UI Sort Direction.
+ * @see \HyperfTest\Unit\Shared\Presentation\Query\SortOrderTest
+ */
 enum SortOrder: string
 {
     case ASC = 'asc';
@@ -24,12 +27,18 @@ enum SortOrder: string
         return $this === self::ASC ? self::DESC : self::ASC;
     }
 
-    public static function fromRequest(
-        RequestInterface $request,
+    /**
+     * Factory from query array.
+     * Extracts 'dir' (RequestParam::SORT_ORDER). 
+     * If value matches opposite of $default, returns it; otherwise returns $default.
+     */
+    public static function fromRequestQuery(
+        array $requestQuery,
         self $default = self::DEFAULT,
         string $param = RequestParam::SORT_ORDER
     ): self {
         $notDefault = $default->opposite();
-        return $request->query($param, $default->value) === $notDefault->value ? $notDefault : $default;
+        $value = $requestQuery[$param] ?? $default->value;
+        return $value === $notDefault->value ? $notDefault : $default;
     }
 }

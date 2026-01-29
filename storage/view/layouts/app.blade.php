@@ -9,6 +9,7 @@
     <script src="/static/bootstrap.js"></script>
     <script type="module" src="/static/auth.js"></script>
     <script type="module" src="/static/form.js"></script>
+    <script type="module" src="/static/table-sort.js"></script>
 </head>
 <body>
     @section('navbar')

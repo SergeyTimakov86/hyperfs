@@ -9,7 +9,7 @@
 @endsection
 
 <div id="login-overlay" hidden>
-    <div class="spinner">Вход...</div>
+    <div class="spinner">Login...</div>
 </div>
 
 @section('content')

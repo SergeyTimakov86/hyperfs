@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Domain\Model;
 
+/**
+ * Supported games enum.
+ * @see \HyperfTest\Unit\Domain\Model\GameTest
+ */
 enum Game: int
 {
     case EVE_ECHOES = 1;

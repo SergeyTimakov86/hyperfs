@@ -8,7 +8,7 @@
 
 .table {
     --bs-table-border-color: rgba(var(--bs-body-color-rgb), 0.06);
-    --bs-table-striped-bg: rgba(var(--bs-body-color-rgb), 0.02);
+    --bs-table-striped-bg: rgba(var(--bs-body-color-rgb), 0.01);
     --bs-table-hover-bg: rgba(var(--bs-body-color-rgb), 0.03);
 }
 
@@ -16,23 +16,182 @@
     background-color: rgba(var(--bs-body-color-rgb), 0.02);
 }
 
-th[aria-sort] a::after {
+.table-sort-trigger {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: .5rem .75rem;
+    text-align: left;
+    text-align: start;
+    background: none;
+    border: 0;
+    color: inherit;
+    text-decoration: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+.table-sort-trigger:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.table-sort-trigger:hover {
+    text-decoration: underline;
+}
+
+button.table-sort-trigger {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+th[aria-sort] a,
+th[aria-sort] button {
+    display: block;
+    padding: 0.75rem;
+    margin: -0.75rem;
+    outline: none;
+}
+
+/* Customized in fa.css as well */
+th[aria-sort] a::after,
+th[aria-sort] button::after {
+    margin-left: 0.3rem;
     opacity: .7;
 }
 
-th[aria-sort="none"] a::after {
+th[aria-sort="none"] a::after,
+th[aria-sort="none"] button::after {
     content: "\f0dc";
-    opacity: .3;
+    opacity: .2;
 }
 
-th[aria-sort="ascending"] a::after {
+th[aria-sort="ascending"] a::after,
+th[aria-sort="ascending"] button::after {
     content: "\f0de";
     transform: translateY(0.08em);
 }
 
-th[aria-sort="descending"] a::after {
+th[aria-sort="descending"] a::after,
+th[aria-sort="descending"] button::after {
     content: "\f0dd";
     transform: translateY(-0.08em);
+}
+
+@keyframes table-row-highlight {
+    0% { background-color: rgba(var(--bs-primary-rgb), 0.2); }
+    100% { background-color: transparent; }
+}
+
+.row-highlight > * {
+    animation: table-row-highlight 2s ease-out;
+}
+
+.is-invalid {
+    border-color: var(--bs-danger) !important;
+}
+
+.is-invalid + .invalid-feedback {
+    display: block;
+}
+
+/* Empty table state */
+.table-empty-state {
+    padding: 3rem;
+    text-align: center;
+    color: var(--bs-secondary-color);
+    background-color: var(--bs-tertiary-bg);
+    border-radius: var(--bs-border-radius);
+    border: 1px dashed var(--bs-border-color);
+}
+
+/* Mobile scroll improvement */
+.table-responsive {
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+}
+
+/* Shadow to indicate scroll possibility */
+.table-responsive::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 30px;
+    background: linear-gradient(to right, transparent, rgba(var(--bs-body-bg-rgb), 0.8));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 2;
+}
+
+.table-responsive.is-scrolling::after {
+    opacity: 1;
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast-message {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--bs-border-radius);
+    color: #fff;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateY(-1rem);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: auto;
+}
+
+.toast-message.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-message.toast-success {
+    background-color: var(--bs-success);
+}
+
+.toast-message.toast-error {
+    background-color: var(--bs-danger);
+}
+
+/* Mobile toast adjustments */
+@media (max-width: 576px) {
+    .toast-container {
+        left: 1rem;
+        right: 1rem;
+        transform: none;
+        width: auto;
+    }
+
+    .toast-message {
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Touch-friendly buttons for mobile */
+@media (max-width: 768px) {
+    .btn-edit,
+    .btn-delete {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0.5rem 0.75rem;
+    }
 }
 
 

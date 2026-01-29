@@ -20,7 +20,7 @@ $modalLabelId = 'l-account-add';
                     @endphp
 
                     <a class="list-group-item list-group-item-action {{ $active ? 'active' : '' }}"
-                       href="/admin/account?gameSlug={{ $slug }}"
+                       href="/admin/accounts?gameSlug={{ $slug }}"
                     >
                         {{ $game->title() }}
                     </a>
@@ -49,6 +49,7 @@ $modalLabelId = 'l-account-add';
         <x-table-row :columns="$grid->columns()" />
     </template>
 
+
     <div class="modal fade" id="{!! $modalId !!}" tabindex="-1" aria-labelledby="{!! $modalLabelId !!}" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -58,50 +59,26 @@ $modalLabelId = 'l-account-add';
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form class="ajax-form-add" method="POST" action="/admin/account">
+                <form class="ajax-form-add" method="POST" action="/admin/accounts"
+                      data-add-action="/admin/accounts"
+                      data-add-title="Add Account"
+                      data-add-text="Add Account"
+                      data-edit-title="Edit Account"
+                      data-edit-text="Save Changes"
+                >
                     <div class="modal-body">
                         @csrf
-                        <input type="hidden" name="game_id" value="{{ $gameSlug ? $games[$gameSlug]->id() : '' }}">
+                        <x-input.hidden name="id" value="" />
+                        <x-input.hidden name="game_id" :value="$gameSlug ? $games[$gameSlug]->id() : ''" />
 
-                        <div class="mb-3">
-                            <label class="form-label">FunPay Name</label>
-                            <input type="text" class="form-control" name="funpay_name" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Ingame ID</label>
-                            <input type="text" class="form-control" name="ingame_id">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Ingame Name</label>
-                            <input type="text" class="form-control" name="ingame_name">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Corporation</label>
-                            <input type="text" class="form-control" name="ingame_corp">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Alliance</label>
-                            <input type="text" class="form-control" name="ingame_alliance">
-                        </div>
-
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" name="is_seller">
-                            <label class="form-check-label">Is Seller</label>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Discord</label>
-                            <input type="text" class="form-control" name="discord">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Telegram</label>
-                            <input type="text" class="form-control" name="telegram">
-                        </div>
+                        <x-input.text name="funpay_name" label="FunPay Name" required />
+                        <x-input.text name="ingame_id" label="Ingame ID" required />
+                        <x-input.text name="ingame_name" label="Ingame Name" required />
+                        <x-input.text name="ingame_corp" label="Corporation" />
+                        <x-input.text name="ingame_alliance" label="Alliance" />
+                        <x-input.checkbox name="is_seller" label="Is Seller" />
+                        <x-input.text name="discord" label="Discord" />
+                        <x-input.text name="telegram" label="Telegram" />
 
                     </div>
 

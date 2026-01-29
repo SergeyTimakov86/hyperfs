@@ -19,3 +19,32 @@ avg=4.27ms min=2.45ms med=3.9ms  max=182.83ms p(90)=5.09ms p(95)=5.88ms
 avg=6.08ms min=2.76ms med=4.93ms max=397.27ms p(90)=7.76ms p(95)=11.32ms
 avg=5.76ms min=3.09ms med=4.9ms  max=274.7ms  p(90)=7.65ms p(95)=10.61ms
 avg=6.24ms min=3.04ms med=4.99ms max=435.85ms p(90)=8.71ms p(95)=12.32ms
+
+Проведи глубокий анализ:
+
+\App\Infra\Endpoint\Admin\Account\Index
+\App\Shared\Grid\Column\*
+\App\Shared\Presentation\Grid\*
+storage/view/admin/account/index.blade.php
+storage/view/components/table.blade.php
+storage/view/components/table-row.blade.php
+static/table-sort.js
+
+Насколько хорошо это все между собой интегрировано?
+Что можно ускорить или оптимизировать?
+Что можно улучшить арихитектурно?
+
+Просто прошу совета, никаких действий пока не выполняй.
+
+я изменил \App\Shared\Domain\Primitive\StringValue и многих его потомков.
+перепроверь все, если нужно обнови документацию и перепиши тесты.
+
+
+Ты говоришь:
+
+Согласно вашим guidelines, логика получения данных должна быть в репозитории (App\Infra\Persistence\Repository\DatabaseAccounts).
+
+но, ведь для отображения не обязательно использовать доменные объекты?
+ведь допустимы и простые дто?
+а доменные репозитории должны позвращать либо доменные сущности либо их коллекции?
+или я не прав?

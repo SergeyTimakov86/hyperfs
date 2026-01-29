@@ -4,61 +4,37 @@ declare(strict_types=1);
 
 namespace App\Shared\Presentation\Grid;
 
-final class Column
-{
-    private bool $isEditable = false;
-    private bool $isSortable = false;
-    private bool $currentlySorted = false;
-    private string $uriQuery = '';
-    private string $ariaSort = 'none';
+use App\Shared\Grid\Column as ColumnDefinition;
+use App\Shared\Grid\ColumnType;
 
+final readonly class Column
+{
     public function __construct(
-        private readonly string $field,
-        private readonly string $label,
+        private ColumnDefinition $column,
+        private string $uriQuery = '',
+        private string $ariaSort = 'none',
+        private bool $isCurrentlySorted = false,
     ) {
     }
 
     public function field(): string
     {
-        return $this->field;
+        return $this->column->field();
     }
 
     public function label(): string
     {
-        return $this->label;
+        return $this->column->label();
     }
 
-    public function isEditable(): bool
+    public function type(): ColumnType
     {
-        return $this->isEditable;
+        return $this->column->type();
     }
 
     public function isSortable(): bool
     {
-        return $this->isSortable;
-    }
-
-    public function sorted(): bool
-    {
-        return $this->currentlySorted;
-    }
-
-    public function editable(): self
-    {
-        $this->isEditable = true;
-        return $this;
-    }
-
-    public function sortable(): self
-    {
-        $this->isSortable = true;
-        return $this;
-    }
-
-    public function currentlySorted(): self
-    {
-        $this->currentlySorted = true;
-        return $this;
+        return $this->column->isSortable();
     }
 
     public function uriQuery(): string
@@ -66,20 +42,13 @@ final class Column
         return $this->uriQuery;
     }
 
-    public function asUriQuery(string $uriQuery): self
-    {
-        $this->uriQuery = $uriQuery;
-        return $this;
-    }
-
     public function ariaSort(): string
     {
         return $this->ariaSort;
     }
 
-    public function asAriaSort(string $ariaSort): self
+    public function sorted(): bool
     {
-        $this->ariaSort = $ariaSort;
-        return $this;
+        return $this->isCurrentlySorted;
     }
 }

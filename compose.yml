@@ -18,7 +18,7 @@ services:
     volumes:
       - .docker/envoy/config.yaml:/etc/envoy/envoy.yaml:ro
     ports:
-      - "8080:8080"     # публичная точка входа
+      - "8080:8080"     # public entry point
       - "9901:9901"     # admin (dev only)
     depends_on:
       - app
@@ -53,7 +53,7 @@ services:
     volumes:
       - kc_data:/opt/keycloak/data
     ports:
-      - "8081:8080"     # dev-доступ к админке
+      - "8081:8080"     # dev admin access
     depends_on:
         kc-pg:
           condition: service_healthy

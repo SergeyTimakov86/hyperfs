@@ -45,7 +45,7 @@ async function apiFetch(url, options = {}) {
         return;
     }
 
-    await keycloak.updateToken(30); // обновить, если скоро истекает
+    await keycloak.updateToken(30); // update if it expires soon
 
     const headers = new Headers(options.headers || {});
     headers.set('Authorization', `Bearer ${keycloak.token}`);
